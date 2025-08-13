@@ -1,0 +1,342 @@
+# docs/CONTRIBUTING.md
+
+# Contributing to AI Interior Design Assistant
+
+Thank you for your interest in contributing! This document provides guidelines for contributing to the project.
+
+## Getting Started
+
+1. Fork the repository
+2. Clone your fork: `git clone https://github.com/yourusername/ai-interior-design-assistant.git`
+3. Create a virtual environment: `python -m venv venv`
+4. Activate it: `source venv/bin/activate` (or `venv\Scripts\activate` on Windows)
+5. Install dependencies: `pip install -r requirements.txt`
+6. Install development dependencies: `pip install pytest pytest-cov flake8 black`
+
+## Development Workflow
+
+1. Create a feature branch: `git checkout -b feature/your-feature-name`
+2. Make your changes
+3. Write tests for new functionality
+4. Run tests: `python -m pytest tests/`
+5. Format code: `black app.py tests/`
+6. Lint code: `flake8 app.py tests/`
+7. Commit changes: `git commit -m "Add feature: description"`
+8. Push to your fork: `git push origin feature/your-feature-name`
+9. Create a Pull Request
+
+## Code Style
+
+- Follow PEP 8 style guidelines
+- Use `black` for code formatting
+- Maximum line length: 127 characters
+- Use descriptive variable names
+- Add docstrings to functions
+
+## Testing
+
+- Write unit tests for all new functions
+- Maintain at least 80% code coverage
+- Test edge cases and error conditions
+- Use descriptive test names
+
+## Pull Request Guidelines
+
+- Provide a clear description of changes
+- Reference any related issues
+- Include screenshots for UI changes
+- Ensure all tests pass
+- Update documentation if needed
+
+## Reporting Issues
+
+- Use the issue template
+- Provide clear steps to reproduce
+- Include system information
+- Add screenshots if applicable
+
+## Feature Requests
+
+- Check existing issues first
+- Provide clear use case
+- Describe expected behavior
+- Consider implementation complexity
+
+---
+
+# docs/API.md
+
+# API Reference
+
+## Core Functions
+
+### Image Processing
+
+#### `process_image(image, style)`
+Applies style-specific transformations to an image.
+
+**Parameters:**
+- `image` (PIL.Image): Input image
+- `style` (str): Style name ("Modern", "Traditional", etc.)
+
+**Returns:**
+- `PIL.Image`: Processed image
+
+**Example:**
+```python
+from PIL import Image
+from app import process_image
+
+image = Image.open("room.jpg")
+styled_image = process_image(image, "Modern")
+```
+
+#### `safe_multiply_uint8(img_channel, factor)`
+Safely multiplies image channel values with clipping.
+
+**Parameters:**
+- `img_channel` (numpy.ndarray): Image channel array
+- `factor` (float): Multiplication factor
+
+**Returns:**
+- `numpy.ndarray`: Processed channel with uint8 dtype
+
+### Furniture Overlay
+
+#### `add_furniture_overlay(base_image, furniture_items, style)`
+Adds furniture visualization overlay to an image.
+
+**Parameters:**
+- `base_image` (PIL.Image): Base room image
+- `furniture_items` (list): List of furniture item strings
+- `style` (str): Interior design style
+
+**Returns:**
+- `PIL.Image`: Image with furniture overlay
+
+## Data Structures
+
+### FURNITURE_DATA
+Dictionary mapping design styles to furniture recommendations.
+
+**Structure:**
+```python
+{
+    "Style Name": [
+        "🛋 Furniture item 1",
+        "📚 Furniture item 2",
+        ...
+    ]
+}
+```
+
+### COLOR_PALETTES
+Dictionary mapping design styles to color schemes.
+
+**Structure:**
+```python
+{
+    "Style Name": [
+        ("#HEX_COLOR", "Color Name"),
+        ...
+    ]
+}
+```
+
+## Style Processing Details
+
+### Modern Style
+- Brightness boost (1.2x multiplier)
+- Gaussian blur (3x3 kernel)
+- Clean, minimalist aesthetic
+
+### Traditional Style
+- Warm color adjustment (reduce red, boost green/blue)
+- Moderate blur (5x5 kernel)
+- Classic, timeless appearance
+
+### Industrial Style
+- Grayscale conversion with slight color tinting
+- Metal and concrete aesthetic
+- Urban, raw material look
+
+### Scandinavian Style
+- Auto-contrast enhancement
+- Brightness boost (1.3x)
+- Light, airy, functional design
+
+### Bohemian Style
+- Warm color boost (enhance reds)
+- Slight blur for softness
+- Artistic, eclectic appearance
+
+### Minimalist Style
+- Saturation reduction (0.5x)
+- Brightness increase
+- Clean, uncluttered aesthetic
+
+---
+
+# docs/DEPLOYMENT.md
+
+# Deployment Guide
+
+## Streamlit Cloud (Recommended)
+
+1. Push your code to GitHub
+2. Visit [share.streamlit.io](https://share.streamlit.io)
+3. Connect your GitHub account
+4. Select repository and branch
+5. Set main file path to `app.py`
+6. Deploy!
+
+**Configuration:**
+- Automatic SSL certificates
+- Free hosting for public repos
+- Easy sharing with custom URLs
+
+## Heroku Deployment
+
+### Prerequisites
+- Heroku CLI installed
+- Git repository
+
+### Steps
+1. Login to Heroku:
+```bash
+heroku login
+```
+
+2. Create app:
+```bash
+heroku create your-app-name
+```
+
+3. Set buildpacks:
+```bash
+heroku buildpacks:add --index 1 https://github.com/heroku/heroku-buildpack-apt
+heroku buildpacks:add --index 2 heroku/python
+```
+
+4. Deploy:
+```bash
+git push heroku main
+```
+
+### Configuration Files Required
+- `Procfile`: Web server configuration
+- `setup.sh`: Streamlit configuration
+- `runtime.txt`: Python version
+- `Aptfile`: System dependencies
+
+## Docker Deployment
+
+### Build Image
+```bash
+docker build -t interior-design-app .
+```
+
+### Run Container
+```bash
+docker run -p 8501:8501 interior-design-app
+```
+
+### Docker Compose
+```bash
+docker-compose up
+```
+
+## Local Development
+
+### Environment Setup
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate (Linux/Mac)
+source venv/bin/activate
+
+# Activate (Windows)
+venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run application
+streamlit run app.py
+```
+
+### Development Server
+- URL: http://localhost:8501
+- Auto-reload on file changes
+- Debug mode enabled
+
+## Production Considerations
+
+### Performance Optimization
+- Use caching for image processing
+- Optimize image sizes
+- Enable gzip compression
+- Use CDN for static assets
+
+### Security
+- Enable HTTPS
+- Set secure headers
+- Validate file uploads
+- Limit file sizes
+
+### Monitoring
+- Set up health checks
+- Monitor resource usage
+- Track user metrics
+- Log errors
+
+### Scaling
+- Use load balancers
+- Implement caching layers
+- Optimize database queries
+- Monitor response times
+
+## Environment Variables
+
+### Required
+- `STREAMLIT_SERVER_PORT`: Server port (default: 8501)
+- `STREAMLIT_SERVER_ADDRESS`: Server address (default: localhost)
+
+### Optional
+- `STREAMLIT_THEME_PRIMARY_COLOR`: Primary color
+- `STREAMLIT_THEME_BACKGROUND_COLOR`: Background color
+- `DEBUG`: Enable debug mode
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Port Already in Use**
+```bash
+lsof -ti:8501 | xargs kill -9
+```
+
+2. **Memory Issues**
+- Reduce image sizes
+- Clear cache regularly
+- Monitor memory usage
+
+3. **Dependency Conflicts**
+- Use virtual environments
+- Pin dependency versions
+- Check compatibility
+
+### Health Checks
+```bash
+curl http://localhost:8501/_stcore/health
+```
+
+### Logs
+```bash
+# Heroku logs
+heroku logs --tail
+
+# Docker logs
+docker logs container_name
+```
