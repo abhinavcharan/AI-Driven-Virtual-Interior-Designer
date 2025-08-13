@@ -1,0 +1,246 @@
+#!/bin/bash
+
+# Quick Setup Script for AI Interior Design Assistant
+# This script sets up the complete project structure
+
+echo "🏡 AI Interior Design Assistant - Quick Setup"
+echo "=============================================="
+
+# Check if Python is installed
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Python 3 is not installed. Please install Python 3.8 or higher."
+    exit 1
+fi
+
+# Check Python version
+python_version=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
+required_version="3.8"
+
+if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then
+    echo "❌ Python 3.8+ required. Current version: $python_version"
+    exit 1
+fi
+
+echo "✅ Python $python_version detected"
+
+# Create project directory
+PROJECT_NAME="ai-interior-design-assistant"
+if [ -d "$PROJECT_NAME" ]; then
+    echo "⚠️  Directory $PROJECT_NAME already exists"
+    read -p "Do you want to continue? (y/n): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+else
+    mkdir "$PROJECT_NAME"
+    echo "📁 Created project directory: $PROJECT_NAME"
+fi
+
+cd "$PROJECT_NAME"
+
+# Create directory structure
+echo "📂 Creating directory structure..."
+mkdir -p .github/{workflows,ISSUE_TEMPLATE}
+mkdir -p .streamlit
+mkdir -p assets/sample-rooms
+mkdir -p docs
+mkdir -p tests
+
+# Create main application file (app.py)
+echo "📝 Creating app.py..."
+cat > app.py << 'EOF'
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+from PIL import Image, ImageOps, ImageFilter, ImageDraw, ImageEnhance, ImageFont
+import cv2
+import io
+import os
+import base64
+import random
+
+st.set_page_config(page_title="🌿 AI Interior Design Assistant", layout="wide")
+
+# [Rest of the app.py content would be included here - truncated for brevity]
+# You can copy the full content from the provided interior.py file
+
+st.title("🏡 AI Interior Design Assistant")
+st.write("Welcome! Please copy the full app.py content from the provided file.")
+EOF
+
+# Create requirements.txt
+echo "📦 Creating requirements.txt..."
+cat > requirements.txt << 'EOF'
+streamlit==1.32.0
+pandas==2.0.3
+numpy==1.24.3
+plotly==5.15.0
+Pillow==10.0.0
+opencv-python-headless==4.8.0.76
+EOF
+
+# Create Dockerfile
+echo "🐳 Creating Dockerfile..."
+cat > Dockerfile << 'EOF'
+FROM python:3.9-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libgl1-mesa-glx \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8501
+
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+EOF
+
+# Create .gitignore
+echo "🚫 Creating .gitignore..."
+cat > .gitignore << 'EOF'
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.coverage
+.pytest_cache/
+.env
+.venv
+env/
+venv/
+ENV/
+.streamlit/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+uploads/
+temp/
+logs/
+EOF
+
+# Create README.md
+echo "📖 Creating README.md..."
+cat > README.md << 'EOF'
+# AI Interior Design Assistant 🏡
+
+A Streamlit-based web application that helps users visualize different interior design styles.
+
+## Quick Start
+
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+2. Run the application:
+```bash
+streamlit run app.py
+```
+
+3. Open http://localhost:8501 in your browser
+
+## Features
+- 6 different design styles
+- Real-time image processing
+- Furniture recommendations
+- Color palette suggestions
+- Design history tracking
+
+## Deployment
+- Streamlit Cloud: Connect your GitHub repo
+- Heroku: Use included Procfile
+- Docker: `docker build -t interior-app .`
+
+See full documentation in the docs/ directory.
+EOF
+
+# Create Streamlit config
+echo "⚙️ Creating Streamlit config..."
+cat > .streamlit/config.toml << 'EOF'
+[theme]
+primaryColor = "#A1866F"
+backgroundColor = "#F0EAD6"
+secondaryBackgroundColor = "#E8D8C3"
+textColor = "#4B3B2B"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+EOF
+
+# Create basic test file
+echo "🧪 Creating test file..."
+cat > tests/test_app.py << 'EOF'
+import pytest
+from PIL import Image
+import sys
+import os
+
+# Add parent directory to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+def test_image_creation():
+    """Test basic image creation"""
+    img = Image.new('RGB', (100, 100), color='white')
+    assert img.size == (100, 100)
+    assert img.mode == 'RGB'
+
+def test_placeholder():
+    """Placeholder test - replace with actual tests"""
+    assert True
+EOF
+
+# Create virtual environment
+echo "🐍 Creating virtual environment..."
+python3 -m venv venv
+
+# Activate virtual environment and install dependencies
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+    # Windows
+    source venv/Scripts/activate
+else
+    # Unix/Linux/macOS
+    source venv/bin/activate
+fi
+
+echo "📦 Installing dependencies..."
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Install development dependencies
+pip install pytest pytest-cov flake8 black
+
+echo ""
+echo "🎉 Setup completed successfully!"
+echo ""
+echo "Next steps:"
+echo
