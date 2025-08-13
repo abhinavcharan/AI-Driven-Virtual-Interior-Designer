@@ -1,0 +1,52 @@
+# Procfile (for Heroku)
+web: sh setup.sh && streamlit run app.py
+
+---
+
+# setup.sh (for Heroku)
+#!/bin/bash
+mkdir -p ~/.streamlit/
+echo "\
+[general]\n\
+email = \"your-email@domain.com\"\n\
+" > ~/.streamlit/credentials.toml
+echo "\
+[server]\n\
+headless = true\n\
+enableCORS=false\n\
+port = $PORT\n\
+" > ~/.streamlit/config.toml
+
+---
+
+# runtime.txt (for Heroku)
+python-3.9.18
+
+---
+
+# .streamlit/config.toml
+[theme]
+primaryColor = "#A1866F"
+backgroundColor = "#F0EAD6"
+secondaryBackgroundColor = "#E8D8C3"
+textColor = "#4B3B2B"
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+
+---
+
+# docker-compose.yml
+version: '3.8'
+services:
+  interior-design-app:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
